@@ -19,8 +19,8 @@ RANDOM_STATE = 42
 
 # Hyperparameters
 ALPHA = 1.0                       # For Ridge
-N_ESTIMATORS = 50                 # For Random Forest
-MAX_DEPTH = 10                    # For Random Forest
+N_ESTIMATORS = 100                 # For Random Forest
+MAX_DEPTH = 15                # For Random Forest
 
 # Ensure output directory exists
 os.makedirs("output", exist_ok=True)
