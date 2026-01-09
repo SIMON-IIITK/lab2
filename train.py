@@ -12,8 +12,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 #  LAB 1 EXPERIMENT CONFIGURATION
 #  (Edit this section for each experiment)
 # ==========================================
-MODEL_TYPE = "LinearRegression"   # Options: LinearRegression, Ridge, RandomForest
-SCALING = False                   # Set True for Ridge, False for others (per Lab 1)
+MODEL_TYPE = "Ridge"   # Options: LinearRegression, Ridge, RandomForest
+SCALING = True                   # Set True for Ridge, False for others (per Lab 1)
 TEST_SIZE = 0.2                   # 80/20 Split
 RANDOM_STATE = 42
 
