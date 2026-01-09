@@ -11,7 +11,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 # EXPERIMENT CONFIGURATION
 # (Edit these for Task 5 experiments)
 # ==========================================
-MODEL_TYPE = "LinearRegression"  # Options: LinearRegression, Ridge, Lasso
+MODEL_TYPE = "Ridge"  # Options: LinearRegression, Ridge, Lasso
 TEST_SIZE = 0.3
 RANDOM_STATE = 42
 ALPHA = 0.1  # Only for Ridge/Lasso
