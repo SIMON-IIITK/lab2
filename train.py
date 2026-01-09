@@ -4,71 +4,90 @@ import joblib
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
 # ==========================================
-# EXPERIMENT CONFIGURATION
-# (Edit these for Task 5 experiments)
+#  LAB 1 EXPERIMENT CONFIGURATION
+#  (Edit this section for each experiment)
 # ==========================================
-MODEL_TYPE = "Ridge"  # Options: LinearRegression, Ridge, Lasso
-TEST_SIZE = 0.3
+MODEL_TYPE = "LinearRegression"   # Options: LinearRegression, Ridge, RandomForest
+SCALING = False                   # Set True for Ridge, False for others (per Lab 1)
+TEST_SIZE = 0.2                   # 80/20 Split
 RANDOM_STATE = 42
-ALPHA = 0.1  # Only for Ridge/Lasso
+
+# Hyperparameters
+ALPHA = 1.0                       # For Ridge
+N_ESTIMATORS = 50                 # For Random Forest
+MAX_DEPTH = 10                    # For Random Forest
 
 # Ensure output directory exists
 os.makedirs("output", exist_ok=True)
 
 def main():
     print("Loading data...")
-    # Load dataset (Note: this dataset uses ';' as separator)
-    data = pd.read_csv('dataset/winequality-red.csv', sep=';')
+    # Load dataset
+    try:
+        data = pd.read_csv('dataset/winequality-red.csv', sep=';')
+    except:
+        print("Error: Dataset file not found.")
+        return
 
-    # 1. Prepare Data
     X = data.drop('quality', axis=1)
     y = data['quality']
 
-    # 2. Split and Preprocess
+    # Split Data
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE
     )
     
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
+    # Preprocessing (Scaling) - Only if SCALING is True
+    if SCALING:
+        print("Applying StandardScaler...")
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+    else:
+        print("No scaling applied (Raw data)...")
 
-    # 3. Train Model
+    # Model Selection
     print(f"Training {MODEL_TYPE}...")
     if MODEL_TYPE == "LinearRegression":
         model = LinearRegression()
     elif MODEL_TYPE == "Ridge":
         model = Ridge(alpha=ALPHA)
-    elif MODEL_TYPE == "Lasso":
-        model = Lasso(alpha=ALPHA)
-    
-    model.fit(X_train_scaled, y_train)
+    elif MODEL_TYPE == "RandomForest":
+        model = RandomForestRegressor(
+            n_estimators=N_ESTIMATORS, 
+            max_depth=MAX_DEPTH, 
+            random_state=RANDOM_STATE
+        )
+    else:
+        raise ValueError("Unknown model type")
 
-    # 4. Evaluate
-    y_pred = model.predict(X_test_scaled)
+    # Train and Evaluate
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
     print(f"MSE: {mse}")
     print(f"R2 Score: {r2}")
 
-    # 5. Save Artifacts
-    # Save Model
+    # Save Artifacts
     joblib.dump(model, 'output/model.pkl')
     
-    # Save Metrics to JSON
     metrics = {
         "model_type": MODEL_TYPE,
         "mse": mse,
         "r2_score": r2,
-        "hyperparameters": {
-            "test_size": TEST_SIZE,
-            "random_state": RANDOM_STATE,
-            "alpha": ALPHA
+        "config": {
+            "scaling": SCALING,
+            "alpha": ALPHA,
+            "n_estimators": N_ESTIMATORS,
+            "max_depth": MAX_DEPTH
         }
     }
     
